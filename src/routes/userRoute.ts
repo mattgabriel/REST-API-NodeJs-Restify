@@ -66,6 +66,42 @@ function userRoute(server: restify.Server) {
 		[routeCtrl.signup]
 	);
 
+	/**
+	 * @api {get} /user Details
+	 * @apiGroup User
+	 * @apiVersion 1.0.0
+	 * @apiName Details
+	 * @apiUse AuthHeader
+	 * @apiDescription Gets user details<br><br>
+	 *
+	 * Sample request:
+	 * <pre>curl -X GET "http://localhost:3000/user/"</pre><br>
+	 *
+	 * @apiSuccessExample {json} Success-Response:
+	 * {
+	 *   "basics": {
+	 *     "userId": String,
+	 *     "email": String,
+	 *     "language": String
+	 * }
+	 *   "images": {}
+	 *   "notifications": {}
+	 * }
+	 * @apiErrorExample InvalidUserType (404):
+	 * {
+	 * "code": "BadRequest",
+	 * "message": "User_NotFound"
+	 * }
+	 */
+	server.get(
+		{
+			path: "/user",
+			version: "1.0.0"
+		},
+		restifyPlugins.jsonBodyParser({ mapParams: true }),
+		[authMiddleware.validateAccessToken, routeCtrl.getUser]
+	);
+
 }
 
 module.exports.routes = userRoute;

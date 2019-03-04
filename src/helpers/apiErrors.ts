@@ -60,6 +60,7 @@ export enum ErrorMsg {
 	User_InvalidEmailFormat = "User_InvalidEmailFormat",
 	User_InvalidUserType = "User_InvalidUserType",
 	User_EmailAddressExists = "User_EmailAddressExists",
+	User_NotFoundError = "User_NotFoundError",
 }
 
 

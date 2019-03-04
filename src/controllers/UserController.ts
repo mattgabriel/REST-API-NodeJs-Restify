@@ -1,12 +1,18 @@
 import * as restify from "restify";
 import { config } from "../config/config";
-import { Error, ApiError, ErrorCode, ErrorMsg } from "../helpers/apiErrors";
+import { Error, ApiError, ErrorCode, ErrorMsg, errorHandler } from "../helpers/apiErrors";
 import { IToken, ITokenUser, generateToken } from "../models/authModel";
 import { Auth } from "../services/authService";
-import { User } from "../services/userService";
+import { UserService } from "../services/userService";
 import { INewUser } from "../entities/userEntity";
 
 class UserController {
+
+	userService: UserService;
+
+	constructor() {
+		this.userService = new UserService();
+	}
 
 	public signup = async (req: restify.Request, res: restify.Response, next: restify.Next) => {
 		try {
@@ -15,8 +21,7 @@ class UserController {
 			}
 
 			// create the user in the DB
-			const userObj = new User();
-			const userData: INewUser = await userObj.createUser(req.params.email, req.params.password, req.params.type);
+			const userData: INewUser = await this.userService.createUser(req.params.email, req.params.password, req.params.type);
 
 			// now we can generate some tokens for the user
 			const user: ITokenUser = {
@@ -42,10 +47,19 @@ class UserController {
 				roleId: user.roleId
 			});
 		} catch (err) {
-			if (err instanceof Error) {
-				return next(ApiError.httpResponse(err.errorMsg, err.errorCode || ErrorCode.InternalServerError));
-			}
-			return next(ApiError.httpResponse(ErrorMsg.General_BadRequest, ErrorCode.BadRequestError));
+			const error = errorHandler(err, new Error(ErrorMsg.General_InternalServerError, ErrorCode.InternalServerError));
+			return next(ApiError.httpResponse(error.errorMsg, error.errorCode || ErrorCode.InternalServerError));
+		}
+	}
+
+	public getUser = async (req: restify.Request, res: restify.Response, next: restify.Next) => {
+		try {
+			const userId = req._locals.userId;
+			const user = await this.userService.getUser(userId);
+			return res.json(200, user);
+		} catch (err) {
+			const error = errorHandler(err, new Error(ErrorMsg.General_InternalServerError, ErrorCode.InternalServerError));
+			return next(ApiError.httpResponse(error.errorMsg, error.errorCode || ErrorCode.InternalServerError));
 		}
 	}
 }

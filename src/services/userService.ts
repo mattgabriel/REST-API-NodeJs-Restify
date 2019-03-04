@@ -4,8 +4,9 @@ import { FieldValidator } from "../helpers/fieldValidator";
 import { UserRoles, UserRole } from "../models/userModel";
 import { UserEntity, INewUser } from "../entities/userEntity";
 import { Random } from "../helpers/random";
+import { User } from "../models/userModel";
 
-export class User {
+export class UserService {
 
 	/*
 		- validate email address format
@@ -54,6 +55,18 @@ export class User {
 				return user;
 			}
 			throw new Error(ErrorMsg.General_InternalServerError, ErrorCode.InternalServerError);
+		} catch (err) {
+			throw errorHandler(err, new Error(ErrorMsg.General_InternalServerError, ErrorCode.InternalServerError));
+		}
+	}
+
+	public getUser = async (userId: string): Promise<User> => {
+		try {
+			const rawUser = await UserEntity.getUserDetails(userId);
+			const user = new User();
+			user.basics._userId = rawUser.userId;
+			user.basics._email = rawUser.email;
+			return user;
 		} catch (err) {
 			throw errorHandler(err, new Error(ErrorMsg.General_InternalServerError, ErrorCode.InternalServerError));
 		}

@@ -1,0 +1,15 @@
+{
+  "name": "API",
+  "version": "1.0.0",
+  "description": "RESTful API",
+  "title": "API",
+  "url" : "http://localhost:3000",
+  "sampleUrl" : " ",
+  "template" : {
+  	"forceLanguage" : "en"
+  },
+  "header": {
+    "title": "Getting Started",
+    "filename": "header.md"
+  }
+}
